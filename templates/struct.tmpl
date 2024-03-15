@@ -1,0 +1,5 @@
+type {{ .StructName }} struct {
+{{- range $key, $value := .Fields }}
+	{{ $key }} {{ $value.Type }} {{ if $value.Required }}`json:"{{ $key }},required"`{{ else }}`json:"{{ $key }}"`{{ end -}}
+{{ end }}
+}

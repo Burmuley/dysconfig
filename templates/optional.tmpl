@@ -1,0 +1,9 @@
+{{- $sn := .StructName -}}
+{{- range $k, $v := .Fields -}}
+{{- if not $v.Required -}}
+func (c *{{ $sn }}) With{{ $k | Title }}(value {{ $v.Type }}) *{{ $sn }} {
+    c.{{ $k }} = value
+    return c
+}
+{{- end }}
+{{ end -}}

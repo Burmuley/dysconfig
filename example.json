@@ -1,0 +1,23 @@
+[
+  {
+    "StructName": "DatabaseConfig",
+    "Fields": {
+      "address": {
+        "type": "string",
+        "required": true
+      },
+      "login": {
+        "type": "string",
+        "required": false
+      },
+      "password": {
+        "type": "string",
+        "required": false
+      },
+      "databaseName": {
+        "type": "string",
+        "required": true
+      }
+    }
+  }
+]

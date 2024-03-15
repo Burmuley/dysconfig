@@ -1,0 +1,23 @@
+{{ define "constructor_params" -}}
+{{- $params := "" -}}
+{{- range $k, $v := .Fields -}}
+{{- if $v.Required -}}
+{{ $str := printf "%s %s" ($k | ToLower) $v.Type -}}
+{{- if eq (len $params) 0 -}}
+{{- $params = $str -}}
+{{- else -}}
+{{- $params = Join ", " $params $str -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- print $params -}}
+{{- end }}
+func New{{.StructName}}({{- template "constructor_params" . }}) *{{.StructName}} {
+    return &{{.StructName}}{
+   	{{- range $k, $v := .Fields }}
+    {{- if $v.Required }}
+     	{{ $k }}: {{ $k | ToLower -}}
+    {{ end -}}
+    {{ end }}
+    }
+}
