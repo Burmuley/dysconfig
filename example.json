@@ -1,20 +1,23 @@
 [
   {
-    "StructName": "DatabaseConfig",
-    "Fields": {
-      "address": {
+    "struct_name": "DatabaseConfig",
+    "json_tags": true,
+    "fields": {
+      "Address": {
         "type": "string",
         "required": true
       },
-      "login": {
+      "Aogin": {
         "type": "string",
-        "required": false
+        "required": false,
+        "default": "root"
       },
-      "password": {
+      "Password": {
         "type": "string",
-        "required": false
+        "required": false,
+        "default": "secret_password"
       },
-      "databaseName": {
+      "DatabaseName": {
         "type": "string",
         "required": true
       }

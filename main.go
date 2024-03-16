@@ -1,51 +1,46 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
 
-type FieldParameters struct {
-	Type     string
-	Required bool
-}
-
-type Fields map[string]FieldParameters
-
-type Schema []struct {
-	StructName string
-	Fields     Fields
+func getOutput(o string) io.Writer {
+	if o == "stdout" {
+		return os.Stdout
+	}
+	f, err := os.Create(o)
+	if err != nil {
+		log.Fatalf("error creating file: %s", err)
+	}
+	return f
 }
 
 func main() {
+	// setup and parse command line arguments
+	schemaFile := flag.String("schema", "config_schema.json", "configuration schema file")
+	outputDst := flag.String("output", "stdout", "output file name")
+	packageName := flag.String("package", "main", "package name for generated files")
+	addHeaderFooter := flag.Bool("headers", true, "add header to generated files")
+	flag.Parse()
+
+	// get output destination
+	output := getOutput(*outputDst)
+
+	// prepare templates
 	tmpls, err := prepareTemplates()
 	if err != nil {
 		log.Fatalf("error preparing templates: %s", err)
 	}
-
-	file := "example.json"
-	f, err := os.Open(file)
-	defer f.Close()
+	// parse schema
+	schema, err := parseSchema(*schemaFile)
 	if err != nil {
-		log.Fatalf("error opening file: %s", err)
+		log.Fatalf("error parsing schema: %s", err)
 	}
-
-	schema := make(Schema, 0)
-	jsonParser := json.NewDecoder(f)
-	if err := jsonParser.Decode(&schema); err != nil {
-		log.Fatalf("error parsing json: %s", err)
-	}
-	genBuf := bytes.NewBuffer([]byte{})
-	for _, s := range schema {
-		for _, t := range tmplNames {
-			err := tmpls[t].Execute(genBuf, s)
-			if err != nil {
-				log.Fatalf("error executing template: %s", err)
-			}
-		}
-	}
-	fmt.Println(genBuf.String())
+	// generate code
+	formatted, err := genFromSchema(tmpls, schema, *addHeaderFooter, *packageName)
+	fmt.Fprint(output, string(formatted))
 }
