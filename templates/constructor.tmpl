@@ -19,7 +19,7 @@ func New{{.StructName}}({{- template "constructor_params" . }}) *{{.StructName}}
      	{{ $k }}: {{ $k | ToLower -}},
     {{- end -}}
     {{- if and (not $v.Required) (ne $v.Default nil) }}
-     	{{ $k }}: {{ ConvertType $v.Default -}},
+     	{{ $k }}: {{ $v.Default -}},
     {{- end -}}
     {{ end }}
     }

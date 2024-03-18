@@ -1,4 +1,4 @@
-{{- $sn := .StructName -}}
+{{ $sn := .StructName -}}
 {{- range $k, $v := .Fields -}}
 {{- if not $v.Required -}}
 func (c *{{ $sn }}) With{{ $k | Title }}(value {{ $v.Type }}) *{{ $sn }} {
@@ -6,4 +6,4 @@ func (c *{{ $sn }}) With{{ $k | Title }}(value {{ $v.Type }}) *{{ $sn }} {
     return c
 }
 {{- end }}
-{{ end -}}
+{{ end }}
