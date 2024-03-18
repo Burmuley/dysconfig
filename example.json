@@ -1,5 +1,33 @@
 [
   {
+    "struct_name": "User",
+    "json_tags": false,
+    "fields": {
+      "Login": {
+        "type": "string",
+        "required": true
+      },
+      "FirstName": {
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      "LastName": {
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      "Addresses": {
+        "type": "[]string",
+        "required": false,
+        "default": [
+          "41400 Blacow Rd, Fremont, CA 94538",
+          "103 E Main Ave, Fort Pierre, SD 57532"
+        ]
+      }
+    }
+  },
+  {
     "struct_name": "DatabaseConfig",
     "json_tags": true,
     "fields": {
@@ -7,12 +35,12 @@
         "type": "string",
         "required": true
       },
-      "Aogin": {
+      "ConnLogin": {
         "type": "string",
         "required": false,
         "default": "root"
       },
-      "Password": {
+      "ConnPassword": {
         "type": "string",
         "required": false,
         "default": "secret_password"
@@ -20,6 +48,32 @@
       "DatabaseName": {
         "type": "string",
         "required": true
+      },
+      "Users": {
+        "type": "[]User",
+        "required": false,
+        "default": [
+          {
+            "Login": "admin",
+            "FirstName": "Admin",
+            "LastName": "Admin"
+          },
+          {
+            "Login": "user",
+            "FirstName": "User",
+            "LastName": "User"
+          }
+        ]
+      },
+      "MaxConnections": {
+        "type": "int",
+        "required": false,
+        "default": 100
+      },
+      "NoSQL": {
+        "type": "bool",
+        "required": false,
+        "default": false
       }
     }
   }
