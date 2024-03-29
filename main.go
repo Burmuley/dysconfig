@@ -8,15 +8,15 @@ import (
 	"os"
 )
 
-func getOutput(o string) io.Writer {
+func getOutput(o string) (io.Writer, error) {
 	if o == "stdout" {
-		return os.Stdout
+		return os.Stdout, nil
 	}
 	f, err := os.Create(o)
 	if err != nil {
-		log.Fatalf("error creating file: %s", err)
+		return nil, fmt.Errorf("error creating file: %w", err)
 	}
-	return f
+	return f, nil
 }
 
 func main() {
@@ -28,7 +28,10 @@ func main() {
 	flag.Parse()
 
 	// get output destination
-	output := getOutput(*outputDst)
+	output, err := getOutput(*outputDst)
+	if err != nil {
+		log.Fatalf("error getting output destination: %s", err)
+	}
 
 	// prepare templates
 	tmpls, err := prepareTemplates()

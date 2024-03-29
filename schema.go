@@ -6,7 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	_ "embed"
+
+	jsonschema "github.com/santhosh-tekuri/jsonschema/v5"
 )
+
+//go:embed schema.json
+var jsonSchemaData []byte
 
 type VariableType string
 
@@ -84,6 +91,25 @@ type Schema []struct {
 	Fields     Fields `json:"fields"`
 }
 
+func validateSchema(config_schema []byte) error {
+	compiledSchema, err := jsonschema.CompileString("schema.json", string(jsonSchemaData))
+
+	if err != nil {
+		return fmt.Errorf("error compiling JSON schema: %w", err)
+	}
+
+	var v interface{}
+	if err := json.Unmarshal(config_schema, &v); err != nil {
+		return fmt.Errorf("error unmarshalling config schema: %w", err)
+	}
+
+	if err := compiledSchema.Validate(v); err != nil {
+		return fmt.Errorf("error validating config schema: %w", err)
+	}
+
+	return nil
+}
+
 func parseSchema(file string) (Schema, error) {
 	f, err := os.Open(file)
 	defer f.Close()
@@ -91,10 +117,17 @@ func parseSchema(file string) (Schema, error) {
 		return nil, fmt.Errorf("error opening file: %w", err)
 	}
 
+	buf := bytes.NewBuffer([]byte{})
+	buf.ReadFrom(f)
+	data := buf.Bytes()
+
 	schema := make(Schema, 0)
-	jsonParser := json.NewDecoder(f)
-	if err := jsonParser.Decode(&schema); err != nil {
-		return nil, fmt.Errorf("error parsing json: %w", err)
+	if err := json.Unmarshal(data, &schema); err != nil {
+		return nil, fmt.Errorf("error parsing schema file: %w", err)
+	}
+
+	if err := validateSchema(data); err != nil {
+		return nil, fmt.Errorf("error validating schema: %w", err)
 	}
 
 	return schema, nil

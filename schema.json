@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Burmuley/dysconfig/blob/main/schema.json",
+  "title": "Dysfunctional Configuration",
+  "description": "Dysfunctional options pattern in Go configuration schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [],
+    "properties": {
+      "struct_name": {
+        "type": "string"
+      },
+      "json_tags": {
+        "type": "boolean"
+      },
+      "fields": {
+        "$ref": "#/$defs/field"
+      }
+    }
+  },
+  "$defs": {
+    "field": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "default": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "array"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      }
+    }
+  }
+}
