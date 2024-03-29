@@ -14,7 +14,6 @@ import (
 var (
 	tmplNames  = []string{"struct.tmpl", "constructor.tmpl", "optional.tmpl"}
 	headerTmpl = "header.tmpl"
-	footerTmpl = "footer.tmpl"
 )
 
 //go:embed templates/*
@@ -65,10 +64,6 @@ func genFromSchema(tmpls map[string]*template.Template, schema Schema, ah bool, 
 		}
 	}
 
-	if ah {
-		addFooter(genBuf)
-	}
-
 	formatted, err := format.Source(genBuf.Bytes())
 	if err != nil {
 		fmt.Println(genBuf.String())
@@ -80,12 +75,6 @@ func genFromSchema(tmpls map[string]*template.Template, schema Schema, ah bool, 
 
 func addHeader(buf *bytes.Buffer) {
 	header, _ := tmplFiles.ReadFile(path.Join("templates", headerTmpl))
-	buf.Write(header)
-	return
-}
-
-func addFooter(buf *bytes.Buffer) {
-	header, _ := tmplFiles.ReadFile(path.Join("templates", footerTmpl))
 	buf.Write(header)
 	return
 }
