@@ -35,7 +35,7 @@ go install -u github.com/burmuley/dysconfig@latest
         "type": "string",
         "required": true
       },
-      "Aogin": {
+      "Login": {
         "type": "string",
         "required": false,
         "default": "root"
@@ -65,7 +65,7 @@ package testoutput
 
 type DatabaseConfig struct {
 	Address      string `json:"Address,required"`
-	Aogin        string `json:"Aogin"`
+	Login        string `json:"Login"`
 	DatabaseName string `json:"DatabaseName,required"`
 	Password     string `json:"Password"`
 }
@@ -73,14 +73,14 @@ type DatabaseConfig struct {
 func NewDatabaseConfig(address string, databasename string) *DatabaseConfig {
 	return &DatabaseConfig{
 		Address:      address,
-		Aogin:        "root",
+		Login:        "root",
 		DatabaseName: databasename,
 		Password:     "secret_password",
 	}
 }
 
-func (c *DatabaseConfig) WithAogin(value string) *DatabaseConfig {
-	c.Aogin = value
+func (c *DatabaseConfig) WithLogin(value string) *DatabaseConfig {
+	c.Login = value
 	return c
 }
 
