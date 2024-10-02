@@ -16,6 +16,9 @@
       },
       "fields": {
         "$ref": "#/$defs/field"
+      },
+      "optionals": {
+        "type": "boolean"
       }
     }
   },
@@ -38,6 +41,12 @@
           },
           "required": {
             "type": "boolean"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [

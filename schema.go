@@ -15,8 +15,14 @@ import (
 //go:embed schema.json
 var jsonSchemaData []byte
 
+var optionals_default bool = true
+
+// VariableType represents a flexible type that can unmarshal various JSON data types.
 type VariableType string
 
+// UnmarshalJSON implements the json.Unmarshaler interface for VariableType.
+// It attempts to unmarshal the input bytes into different data types (number, string, bool, map, array)
+// and converts the result to a string representation.
 func (vt *VariableType) UnmarshalJSON(b []byte) error {
 	{ // try json.Number
 		var n json.Number
@@ -34,7 +40,7 @@ func (vt *VariableType) UnmarshalJSON(b []byte) error {
 		}
 	}
 
-	{ // try string
+	{ // try bool
 		var bs bool
 		if err := json.Unmarshal(b, &bs); err == nil {
 			*vt = VariableType(fmt.Sprintf("%t", bs))
@@ -81,6 +87,7 @@ type FieldParameters struct {
 	Type     string       `json:"type"`
 	Required bool         `json:"required"`
 	Default  VariableType `json:"default"`
+	Tags     []string     `json:"tags"`
 }
 
 type Fields map[string]FieldParameters
@@ -88,9 +95,12 @@ type Fields map[string]FieldParameters
 type Schema []struct {
 	StructName string `json:"struct_name"`
 	JsonTags   bool   `json:"json_tags"`
+	Optionals  *bool  `json:"optionals"`
 	Fields     Fields `json:"fields"`
 }
 
+// validateSchema validates the given config_schema against the JSON schema defined in jsonSchemaData.
+// It returns an error if the schema compilation, unmarshalling, or validation fails.
 func validateSchema(config_schema []byte) error {
 	compiledSchema, err := jsonschema.CompileString("schema.json", string(jsonSchemaData))
 
@@ -110,6 +120,8 @@ func validateSchema(config_schema []byte) error {
 	return nil
 }
 
+// parseSchema reads a schema file, unmarshals it into a Schema struct, sets default values for optionals,
+// and validates the schema. It returns the parsed Schema and any error encountered during the process.
 func parseSchema(file string) (Schema, error) {
 	f, err := os.Open(file)
 	defer f.Close()
@@ -124,6 +136,12 @@ func parseSchema(file string) (Schema, error) {
 	schema := make(Schema, 0)
 	if err := json.Unmarshal(data, &schema); err != nil {
 		return nil, fmt.Errorf("error parsing schema file: %w", err)
+	}
+
+	for i := range schema {
+		if schema[i].Optionals == nil {
+			schema[i].Optionals = &optionals_default
+		}
 	}
 
 	if err := validateSchema(data); err != nil {

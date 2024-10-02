@@ -30,15 +30,22 @@
   {
     "struct_name": "DatabaseConfig",
     "json_tags": true,
+    "optionals": false,
     "fields": {
       "Address": {
         "type": "string",
-        "required": true
+        "required": true,
+        "tags": [
+          "env:\"DATABASE_ADDRESS\""
+        ]
       },
       "ConnLogin": {
         "type": "string",
         "required": false,
-        "default": "root"
+        "default": "root",
+        "tags": [
+          "env:\"DATABASE_LOGIN\""
+        ]
       },
       "ConnPassword": {
         "type": "string",
@@ -47,7 +54,10 @@
       },
       "DatabaseName": {
         "type": "string",
-        "required": true
+        "required": true,
+        "tags": [
+          "env:\"DATABASE_NAME\""
+        ]
       },
       "Users": {
         "type": "[]User",
