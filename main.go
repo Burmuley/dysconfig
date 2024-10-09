@@ -48,5 +48,8 @@ func main() {
 	}
 	// generate code
 	formatted, err := genFromSchema(tmpls, schema, *addHeaderFooter, *packageName)
+	if err != nil {
+		log.Fatalf("error generating templates: %s", err)
+	}
 	fmt.Fprint(output, string(formatted))
 }

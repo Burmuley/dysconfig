@@ -6,18 +6,24 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": [],
+    "required": [
+      "struct_name",
+      "fields"
+    ],
     "properties": {
       "struct_name": {
+        "$comment": "defines the name of the data structure",
         "type": "string"
       },
       "json_tags": {
+        "$comment": "flag defines whether to generate JSON tags for data structure fields; default = false",
         "type": "boolean"
       },
       "fields": {
         "$ref": "#/$defs/field"
       },
       "optionals": {
+        "$comment": "flag defines whether to generate data structure methods to set optional values; default = true",
         "type": "boolean"
       }
     }

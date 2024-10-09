@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"go/format"
-	"log"
 	"path"
 	"strings"
 	"text/template"
@@ -26,20 +25,11 @@ func prepareTemplates() (map[string]*template.Template, error) {
 	var err error
 	tmpls := make(map[string]*template.Template)
 	funcs := template.FuncMap{
-		"ToLower": strings.ToLower,
-		"Join":    func(sep string, str ...string) string { return strings.Join(str, sep) },
-		"Title":   strings.Title,
-		"Dict":    dict,
-		"ConvertType": func(t any) any {
-			switch i := t.(type) {
-			case int:
-				return i
-			case string:
-				return fmt.Sprintf("%q", i)
-			default:
-				return t
-			}
-		},
+		"ToLower":     strings.ToLower,
+		"Join":        func(sep string, str ...string) string { return strings.Join(str, sep) },
+		"Title":       strings.Title,
+		"Dict":        dict,
+		"ConvertType": ConvertType,
 		"UnrefBool":   func(p *bool) bool { return *p },
 		"ToSnakeCase": toSnakeCase,
 	}
@@ -67,15 +57,14 @@ func genFromSchema(tmpls map[string]*template.Template, schema Schema, ah bool, 
 		for _, t := range tmplNames {
 			err := tmpls[t].Execute(genBuf, s)
 			if err != nil {
-				log.Fatalf("error executing template: %s", err)
+				return nil, fmt.Errorf("error executing template: %w", err)
 			}
 		}
 	}
 
 	formatted, err := format.Source(genBuf.Bytes())
 	if err != nil {
-		fmt.Println(genBuf.String())
-		log.Fatalf("error formatting source: %s", err)
+		return nil, fmt.Errorf("error formatting source: %w", err)
 	}
 
 	return formatted, nil
@@ -106,6 +95,19 @@ func dict(elem ...any) map[string]interface{} {
 	return d
 }
 
+// ConvertType converts the input to a suitable type for template rendering.
+// It returns integers as-is, wraps strings in quotes, and leaves other types unchanged.
+func ConvertType(t any) any {
+	switch i := t.(type) {
+	case int:
+		return i
+	case string:
+		return fmt.Sprintf("%q", i)
+	default:
+		return t
+	}
+}
+
 // toSnakeCase converts a string to snake_case format.
 // It handles various input cases, including camelCase and PascalCase.
 func toSnakeCase(input string) string {
@@ -115,7 +117,7 @@ func toSnakeCase(input string) string {
 
 	input_runes := []rune(input)
 	camel_result := ""
-	uadded := false
+	uadded := false // underscore added?
 	for i := 0; i < len(input_runes)-1; i++ {
 		crl := strings.ToLower(string(input_runes[i]))
 		cd := caseDiff(input_runes[i], input_runes[i+1])
@@ -150,6 +152,7 @@ func toSnakeCase(input string) string {
 //	-1 if the first is lowercase and the second is uppercase,
 //	 0 otherwise (including when either rune is an underscore).
 func caseDiff(a, b rune) int {
+	// if any of runes is underscore - cound pair as equal case
 	if a == '_' || b == '_' {
 		return 0
 	}
