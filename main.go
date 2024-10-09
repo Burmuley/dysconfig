@@ -8,6 +8,9 @@ import (
 	"os"
 )
 
+// getOutput returns an io.Writer based on the given output destination.
+// If 'o' is "stdout", it returns os.Stdout. Otherwise, it creates and returns a file with the given name.
+// It returns an error if there's an issue creating the file.
 func getOutput(o string) (io.Writer, error) {
 	if o == "stdout" {
 		return os.Stdout, nil
@@ -45,5 +48,8 @@ func main() {
 	}
 	// generate code
 	formatted, err := genFromSchema(tmpls, schema, *addHeaderFooter, *packageName)
+	if err != nil {
+		log.Fatalf("error generating templates: %s", err)
+	}
 	fmt.Fprint(output, string(formatted))
 }

@@ -1,14 +1,18 @@
-{{- define "json_tags" -}}
+{{- define "tags" -}}
 {{- $tags := "" -}}
 {{ if .Value.Required }}
-	{{- $tags = printf "`json:\"%s,required\"`" .Key -}}
+	{{- $tags = printf "`json:\"%s,required\"" (ToSnakeCase .Key) -}}
 {{- else -}}
-{{- $tags = printf "`json:\"%s\"`" .Key -}}
+{{- $tags = printf "`json:\"%s\"" (ToSnakeCase .Key) -}}
 {{ end -}}
+{{- range $custom_tag := .Value.Tags }}
+    {{- $tags = printf "%s %s" $tags $custom_tag -}}
+{{- end }}
+{{- $tags = printf "%s`" $tags }}
 {{- print $tags -}}
 {{- end -}}
 type {{ .StructName }} struct {
 {{- range $key, $value := .Fields }}
-	{{ $key }} {{ $value.Type }} {{ if $.JsonTags }}{{ template "json_tags" Dict "Key" $key "Value" $value }}{{ end -}}
+	{{ $key }} {{ $value.Type }} {{ if $.JsonTags }}{{ template "tags" Dict "Key" $key "Value" $value }}{{ end -}}
 {{ end }}
 }
