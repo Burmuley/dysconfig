@@ -1,9 +1,13 @@
 {{- define "tags" -}}
 {{- $tags := "" -}}
+{{- $tagName := .Key -}}
+{{ if ne .Value.OverrideJsonTag "" }}
+    {{- $tagName = .Value.OverrideJsonTag -}}
+{{- end -}}
 {{ if .Value.Required }}
-	{{- $tags = printf "`json:\"%s,required\"" (ToSnakeCase .Key) -}}
+	{{- $tags = printf "`json:\"%s,required\"" (ToSnakeCase $tagName) -}}
 {{- else -}}
-{{- $tags = printf "`json:\"%s\"" (ToSnakeCase .Key) -}}
+{{- $tags = printf "`json:\"%s\"" (ToSnakeCase $tagName) -}}
 {{ end -}}
 {{- range $custom_tag := .Value.Tags }}
     {{- $tags = printf "%s %s" $tags $custom_tag -}}

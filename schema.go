@@ -84,10 +84,11 @@ func (vt *VariableType) UnmarshalJSON(b []byte) error {
 }
 
 type FieldParameters struct {
-	Type     string       `json:"type"`
-	Required bool         `json:"required"`
-	Default  VariableType `json:"default"`
-	Tags     []string     `json:"tags"`
+	Type            string       `json:"type"`
+	Required        bool         `json:"required"`
+	Default         VariableType `json:"default"`
+	Tags            []string     `json:"tags"`
+	OverrideJsonTag string       `json:"override_json_tag"`
 }
 
 type Fields map[string]FieldParameters
@@ -103,7 +104,6 @@ type Schema []struct {
 // It returns an error if the schema compilation, unmarshalling, or validation fails.
 func validateSchema(config_schema []byte) error {
 	compiledSchema, err := jsonschema.CompileString("schema.json", string(jsonSchemaData))
-
 	if err != nil {
 		return fmt.Errorf("error compiling JSON schema: %w", err)
 	}

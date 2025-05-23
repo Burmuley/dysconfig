@@ -84,6 +84,17 @@
         "type": "bool",
         "required": false,
         "default": false
+      },
+      "DbType": {
+        "type": "string",
+        "required": true,
+        "override_json_tag": "type"
+      },
+      "SophisticatedName": {
+        "type": "string",
+        "required": false,
+        "override_json_tag": "some_type",
+        "default": "custom_value"
       }
     }
   }

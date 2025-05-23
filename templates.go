@@ -64,6 +64,7 @@ func genFromSchema(tmpls map[string]*template.Template, schema Schema, ah bool, 
 
 	formatted, err := format.Source(genBuf.Bytes())
 	if err != nil {
+		fmt.Println(string(genBuf.Bytes()))
 		return nil, fmt.Errorf("error formatting source: %w", err)
 	}
 

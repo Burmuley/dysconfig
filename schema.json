@@ -53,6 +53,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "override_json_tag": {
+            "type": "string"
           }
         },
         "required": [

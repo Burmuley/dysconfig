@@ -48,9 +48,10 @@ Each data structure definition include the following easy to grasp key-value pai
 
 Each field value in `fields` dictionary also has these key-values you can use to adjust the generated Go code:
 * `type` - (**required**) string name of the type you want this fiueld to be, can be any value even if it is not included in the configuration schema (like when you have a data type defined somewhere else in your code)
-* `default` - (**optional**) string containing default value for the field to be included in the constructor function
 * `required` - (**optional**) flag determines whether the filed is required or optional
+* `default` - (**optional**) string containing default value for the field to be included in the constructor function; **value should be defined** if `required` field is set to `false`
 * `tags` - (**optional**) list of strings containing extra tags to add to the field
+* `override_json_tag` - (**optional**) a string value to use as JSON tag instead of picking the value from the filed name
 
 ```json
 [
@@ -77,6 +78,11 @@ Each field value in `fields` dictionary also has these key-values you can use to
       "DatabaseName": {
         "type": "string",
         "required": true
+      },
+      "DbType": {
+        "type": "string",
+        "required": true,
+        "override_json_tag": "type"
       }
     }
   }
@@ -97,6 +103,7 @@ type DatabaseConfig struct {
 	Login        string `json:"Login"`
 	DatabaseName string `json:"DatabaseName,required"`
 	Password     string `json:"Password"`
+	DbType			 string `json:"type,required"`
 }
 
 func NewDatabaseConfig(address string, databasename string) *DatabaseConfig {
