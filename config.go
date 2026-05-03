@@ -9,7 +9,7 @@ import (
 
 	_ "embed"
 
-	jsonschema "github.com/santhosh-tekuri/jsonschema/v5"
+	jsonschema "github.com/santhosh-tekuri/jsonschema/v6"
 )
 
 //go:embed schema.json
@@ -21,9 +21,19 @@ var optionals_default bool = true
 type VariableType string
 
 // UnmarshalJSON implements the json.Unmarshaler interface for VariableType.
-// It attempts to unmarshal the input bytes into different data types (number, string, bool, map, array)
+// It attempts to unmarshal the input bytes into different data types (null, number, string, bool, map, array)
 // and converts the result to a string representation.
 func (vt *VariableType) UnmarshalJSON(b []byte) error {
+	{ // try null
+		var null any
+		if err := json.Unmarshal(b, &null); err == nil {
+			if null == nil {
+				*vt = VariableType("nil")
+				return nil
+			}
+		}
+	}
+
 	{ // try json.Number
 		var n json.Number
 		if err := json.Unmarshal(b, &n); err == nil {
@@ -93,7 +103,7 @@ type FieldParameters struct {
 
 type Fields map[string]FieldParameters
 
-type Schema []struct {
+type Config []struct {
 	StructName string `json:"struct_name"`
 	JsonTags   bool   `json:"json_tags"`
 	Optionals  *bool  `json:"optionals"`
@@ -103,26 +113,36 @@ type Schema []struct {
 // validateSchema validates the given config_schema against the JSON schema defined in jsonSchemaData.
 // It returns an error if the schema compilation, unmarshalling, or validation fails.
 func validateSchema(config_schema []byte) error {
-	compiledSchema, err := jsonschema.CompileString("schema.json", string(jsonSchemaData))
+	jsonSchema, err := jsonschema.UnmarshalJSON(bytes.NewReader(jsonSchemaData))
+	if err != nil {
+		return fmt.Errorf("error loading JSON schema: %w", err)
+	}
+
+	compiler := jsonschema.NewCompiler()
+	if err := compiler.AddResource("schema.json", jsonSchema); err != nil {
+		return fmt.Errorf("error adding JSON schema resource: %w", err)
+	}
+
+	compiledSchema, err := compiler.Compile("schema.json")
 	if err != nil {
 		return fmt.Errorf("error compiling JSON schema: %w", err)
 	}
 
-	var v interface{}
+	var v any
 	if err := json.Unmarshal(config_schema, &v); err != nil {
-		return fmt.Errorf("error unmarshalling config schema: %w", err)
+		return fmt.Errorf("error unmarshaling config: %w", err)
 	}
 
 	if err := compiledSchema.Validate(v); err != nil {
-		return fmt.Errorf("error validating config schema: %w", err)
+		return fmt.Errorf("error validating config: %w", err)
 	}
 
 	return nil
 }
 
-// parseSchema reads a schema file, unmarshals it into a Schema struct, sets default values for optionals,
-// and validates the schema. It returns the parsed Schema and any error encountered during the process.
-func parseSchema(file string) (Schema, error) {
+// parseConfig reads a configuration file, unmarshal it into a Schema struct, sets default values for "optionals",
+// and validates the schema. It returns the parsed Config and any error encountered during the process.
+func parseConfig(file string) (Config, error) {
 	f, err := os.Open(file)
 	defer f.Close()
 	if err != nil {
@@ -133,20 +153,26 @@ func parseSchema(file string) (Schema, error) {
 	buf.ReadFrom(f)
 	data := buf.Bytes()
 
-	schema := make(Schema, 0)
-	if err := json.Unmarshal(data, &schema); err != nil {
+	config := make(Config, 0)
+	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("error parsing schema file: %w", err)
 	}
 
-	for i := range schema {
-		if schema[i].Optionals == nil {
-			schema[i].Optionals = &optionals_default
+	for i := range config {
+		if config[i].Optionals == nil {
+			config[i].Optionals = &optionals_default
+		}
+
+		for name, value := range config[i].Fields {
+			if !value.Required && value.Default == VariableType("") {
+				return nil, fmt.Errorf("error validating config: fileld '%s' requires default value set", name)
+			}
 		}
 	}
 
 	if err := validateSchema(data); err != nil {
-		return nil, fmt.Errorf("error validating schema: %w", err)
+		return nil, fmt.Errorf("error validating config: %w", err)
 	}
 
-	return schema, nil
+	return config, nil
 }

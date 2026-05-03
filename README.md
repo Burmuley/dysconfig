@@ -2,7 +2,7 @@
 
 This code generator is inspired by the article [Dysfunctional options pattern in Go](https://rednafi.com/go/dysfunctional_options_pattern/) by [Redowan Delowar](https://rednafi.com/).
 
-Now you can define configuration struct(s) schema in a tiny JSON file and use this generator to make up Go code for you.
+Now you can define configuration struct(s) in a tiny JSON file and use this generator to make up Go code for you.
 
 Table of Contents
 =================
@@ -22,7 +22,7 @@ go install -u github.com/burmuley/dysconfig@latest
 
 ## Command line parameters
 
-* `-schema` - path to the JSON file with the schema; default: `config_schema.json`
+* `-config` - path to the JSON file with the configuration; default: `config.json`
 * `-output` - path to the output file; default: `stdout`
 * `-package` - package name; default: `main`
 * `-headers` - add header and footer wrapping the generated output; default: `true`
@@ -33,7 +33,7 @@ go install -u github.com/burmuley/dysconfig@latest
 //go:generate dysconfig -schema=config_schema.json -output=config.go -package=testoutput
 ```
 
-## Configuration schema
+## Configuration file schema
 
 More information on the configuration schema see in [schema.json](schema.json) file.
 

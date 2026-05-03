@@ -2,15 +2,16 @@
   {
     "struct_name": "User",
     "json_tags": false,
+    "optionals": true,
     "fields": {
       "Login": {
         "type": "string",
         "required": true
       },
       "FirstName": {
-        "type": "string",
+        "type": "*string",
         "required": false,
-        "default": ""
+        "default": null
       },
       "LastName": {
         "type": "string",

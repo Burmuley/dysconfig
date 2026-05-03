@@ -43,10 +43,10 @@ func prepareTemplates() (map[string]*template.Template, error) {
 	return tmpls, nil
 }
 
-// genFromSchema generates Go code from the provided schema using the prepared
+// genFromConfig generates Go code from the provided schema using the prepared
 // templates. It applies the templates to each schema item and formats the
 // resulting code.
-func genFromSchema(tmpls map[string]*template.Template, schema Schema, ah bool, packageName string) ([]byte, error) {
+func genFromConfig(tmpls map[string]*template.Template, schema Config, ah bool, packageName string) ([]byte, error) {
 	genBuf := bytes.NewBuffer([]byte{})
 	genBuf.WriteString(fmt.Sprintf("package %s\n\n", packageName))
 	if ah {

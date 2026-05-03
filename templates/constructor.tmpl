@@ -17,8 +17,7 @@ func New{{.StructName}}({{- template "constructor_params" . }}) *{{.StructName}}
    	{{- range $k, $v := .Fields }}
     {{- if $v.Required }}
      	{{ $k }}: {{ $k | ToLower -}},
-    {{- end -}}
-    {{- if and (not $v.Required) (ne $v.Default nil) }}
+    {{- else }}
      	{{ $k }}: {{ $v.Default -}},
     {{- end -}}
     {{ end }}

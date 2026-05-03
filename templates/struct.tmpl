@@ -7,7 +7,7 @@
 {{ if .Value.Required }}
 	{{- $tags = printf "`json:\"%s,required\"" (ToSnakeCase $tagName) -}}
 {{- else -}}
-{{- $tags = printf "`json:\"%s\"" (ToSnakeCase $tagName) -}}
+    {{- $tags = printf "`json:\"%s\"" (ToSnakeCase $tagName) -}}
 {{ end -}}
 {{- range $custom_tag := .Value.Tags }}
     {{- $tags = printf "%s %s" $tags $custom_tag -}}

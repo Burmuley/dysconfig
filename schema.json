@@ -42,7 +42,8 @@
               "string",
               "number",
               "boolean",
-              "array"
+              "array",
+              "null"
             ]
           },
           "required": {
